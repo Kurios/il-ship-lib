@@ -1,6 +1,7 @@
 
 export type WeaponType = "missile" | "torp" | "projectile" | "plasma"
 export type AARange = "self" | "row"
+export type ShipType = "unknown" | "destroyer" | "frigate" | "cruiser" | "battlecruiser" | "carrier" | "fighter" | "corvette"
 
 export class Ship {
     //a ship has modules. Be the armour or whatever....
@@ -9,19 +10,67 @@ export class Ship {
     hp = 0;
     armour = 0;
     energyResist = 0;
+    name = "unknown";
+    type = "unknown";
+    cp = 0;
+
+    initShip(){
+        //So some ship factory makes modules...
+        //initShip then needs to take those modules and "exec" them to make ship stats.
+        for(let module of this.modules){
+            module.initModule(this);
+        }
+    }
 }
-export interface Module {
-    upgradeSlots:number
-    potentialUpgrades:Upgrade[]
-    upgrades:[{upgrade:Upgrade,points:number}]
+export abstract class Module {
+    upgradeSlots = 0
+    type = "N/A"
+    potentialUpgrades:Upgrade[] = []
+    upgrades:{upgrade:Upgrade,points:number}[] = []
+    
+    initModule(ship:Ship):void {
+        //lazy loop twice...
+        for(let upgrade of this.upgrades){
+            if(!upgrade.upgrade.strategy){
+                for(let j = 0; j < upgrade.points; j++){
+                    upgrade.upgrade.function(ship,this)
+                }
+            }
+        }
+        for(let upgrade of this.upgrades){
+            if(upgrade.upgrade.strategy){
+                for(let j = 0; j < upgrade.points; j++){
+                    upgrade.upgrade.function(ship,this)
+                }
+            }
+        }
+    }
 }
-export interface Armour extends Module {
-    type:"armour"
+
+export type ArmourDef = {
+    type:"amour"
     hp:number
     armour:number
     energyResist:number
+    upgrades:string[]
+    slots:number
+}
+
+export class Armour extends Module {
+    type = "armour"
+    hp = 0
+    armour = 0
+    energyResist = 0
+
+    Armour(def:ArmourDef){
+        this.hp = def.hp;
+        this.armour = def.armour;
+        this.energyResist = def.energyResist;
+        this.upgradeSlots = def.slots;
+    }
 
 }
+
 export interface Weapon extends Module {
     type:"weapon"
     name:string
@@ -38,27 +87,81 @@ export type SubWeapon = {
     antiship:number
     antiair:number
     siege:number
-    intercept:number
-    aa_range:AARange
+    intercept?:number
+    aa_range?:AARange
     cooldown:number
     lockon:number
-    duration:number
+    duration?:number
     attacks:number
     rounds:number
 }
 export type Upgrade = {
     name:string
     cost:number[]
-    function:(w:Weapon)=>{}
+    strategy:boolean
+    function:(s:Ship,m:Module)=>{}
 }
 
+export class ShipFactory{
+    
+    static parseShip(def:ShipDefType):Ship{
+        let ship = new Ship();
+        ship.name = def.name;
+        ship.type = def.type;
+        ship.cp = def.cp;
+        return ship
+    }
+}
 
+export type ShipDefType = {
+    name:string
+    type:ShipType
+    cp:number
+    modules:ModuleDef[]
+}
+
+export type ModuleDef = ArmourDef | WeaponDef | SupportDef | EngineDef
+
+export type WeaponDef = {
+    hp?:number
+    main:boolean
+    name:string
+    subweapons:SubWeapon[]
+    upgrades:string[]
+    slots:number
+}
+
+export type SupportDef = {
+    type:"amour"
+    hp:number
+    m_fighters?:number,
+    h_fighters?:number,
+    corvette?:number,
+    repair_UAV?:number,
+    hitrate_UAV?:number,
+    aa_UAV?:number,
+    guided_weapon_dodge?:number
+    direct_fire_dodge?:number
+    upgrades:string[]
+    slots:number
+}
+
+export type EngineDef = {
+    type:"amour"
+    hp:number
+    cruiseSpeed:number
+    warpSpeed:number
+    evasion?:number
+    upgrades:string[]
+    slots:number
+}
 
 let exmaple = [
     {
         "type":"Destroyer",
         "ships": [
             {
+                "type":"destroyer",
                 "name":"Guardian Support",
                 "cp":9,
                 "tank":{
