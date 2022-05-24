@@ -1,0 +1,39 @@
+[
+    {
+        "type":"Destroyer",
+        "ships": [
+            {
+                "name":"Guardian Support",
+                "cp":9,
+                "tank":{
+                    "hp":23490,
+                    "armour":20,
+                    "energy":2,
+                    "evasion": 0,
+                    "guided_weapon_dodge": 30,
+                    "direct_fire_dodge": 0
+                },
+                "support":{
+                    "m_fighters":0,
+                    "h_fighters":0,
+                    "corvette":0,
+                    "repair UAV":0
+                },
+                "weapons":[
+                    {
+                        "name":"Storm Missile",
+                        "type": "missile",
+                        "Alpha" : 80,
+                        "AS" : 3490,
+                        "AA" : 1396,
+                        "SS" : 349,
+                        "target": "air",
+                        "aa_range": "self",
+                        "intercept":0
+                    }
+                ]
+            }
+        ]
+
+    }
+]
