@@ -1,8 +1,8 @@
 
-export type WeaponType = "missile" | "torp" | "projectile" | "plasma"
+export type WeaponType = "missile" | "torp" | "projectile" | "plasma" | "beam" | "cannon"
 export type AARange = "self" | "row"
 export type ShipType = "unknown" | "destroyer" | "frigate" | "cruiser" | "battlecruiser" | "carrier" | "fighter" | "corvette"
-
+export type Priorities = "large" | "small" | "air"
 export class Ship {
     //a ship has modules. Be the armour or whatever....
     modules:Module[] = [];
@@ -48,7 +48,7 @@ export abstract class Module {
 }
 
 export type ArmourDef = {
-    type:"amour"
+    type:"armour"
     hp:number
     armour:number
     energyResist:number
@@ -87,13 +87,16 @@ export type SubWeapon = {
     antiship:number
     antiair:number
     siege:number
+    priority:Priorities
     intercept?:number
     aa_range?:AARange
     cooldown:number
     lockon:number
     duration?:number
-    attacks:number
-    rounds:number
+    attacks?:number
+    rounds?:number
+    count:number
+    fequency?:number
 }
 export type Upgrade = {
     name:string
@@ -123,6 +126,7 @@ export type ShipDefType = {
 export type ModuleDef = ArmourDef | WeaponDef | SupportDef | EngineDef
 
 export type WeaponDef = {
+    type:"weapon"
     hp?:number
     main:boolean
     name:string
@@ -132,8 +136,10 @@ export type WeaponDef = {
 }
 
 export type SupportDef = {
-    type:"amour"
-    hp:number
+    type:"support"
+    hp?:number,
+    evasion?:number,
+    hit_rate?:number,
     m_fighters?:number,
     h_fighters?:number,
     corvette?:number,
@@ -147,7 +153,7 @@ export type SupportDef = {
 }
 
 export type EngineDef = {
-    type:"amour"
+    type:"engine"
     hp:number
     cruiseSpeed:number
     warpSpeed:number
@@ -156,6 +162,9 @@ export type EngineDef = {
     slots:number
 }
 
+
+
+/*
 let exmaple = [
     {
         "type":"Destroyer",
@@ -219,3 +228,4 @@ let upgrades =  [
         }
 
 ]
+*/
